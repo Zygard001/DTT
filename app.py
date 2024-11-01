@@ -20,9 +20,13 @@ def play_video(video_source):
         ret, frame = camera.read()
 
         if ret:
-            visualized_image, detected_emotion, detected_age, detected_gender = utils.predict_image(frame)
+            visualized_image, predictions = utils.predict_image(frame)
+
+            # Display the visualized image and predictions
             st_frame.image(visualized_image, channels="BGR")
-            st.write(f"Detected Emotion: {detected_emotion}, Age: {detected_age}, Gender: {detected_gender}")
+            for face, (age, gender, emotion) in predictions.items():
+                st.write(f"Detected Emotion: {emotion}, Age: {age}, Gender: {gender}")
+                
             video_row.append(cv2.cvtColor(visualized_image, cv2.COLOR_BGR2RGB))
 
             frame_count += 1
@@ -60,9 +64,12 @@ if source_radio == "IMAGE":
     if input is not None:
         uploaded_image = PIL.Image.open(input)
         uploaded_image_cv = np.array(uploaded_image)
-        visualized_image, detected_emotion, detected_age, detected_gender = utils.predict_image(uploaded_image_cv)
+        visualized_image, predictions = utils.predict_image(uploaded_image_cv)
+
+        # Display the visualized image and predictions
         st.image(visualized_image, channels="BGR")
-        st.write(f"Detected Emotion: {detected_emotion}, Age: {detected_age}, Gender: {detected_gender}")
+        for face, (age, gender, emotion) in predictions.items():
+            st.write(f"Detected Emotion: {emotion}, Age: {age}, Gender: {gender}")
 
 elif source_radio == "VIDEO":
     st.sidebar.header("Upload Video")
