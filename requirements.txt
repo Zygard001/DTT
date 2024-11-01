@@ -1,4 +1,5 @@
-opencv-python-headless
-openvino
+streamlit
+opencv-python
 numpy
 Pillow
+moviepy
