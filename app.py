@@ -4,12 +4,11 @@ import numpy as np
 import io
 import tempfile
 import utils
+import cv2
 
 def play_video(video_source):
-    import cv2
     camera = cv2.VideoCapture(video_source)
     fps = camera.get(cv2.CAP_PROP_FPS)
-    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
     video_row = []
 
     total_frames = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -36,8 +35,8 @@ def play_video(video_source):
             break
 
     # Save the video output
-    clip = utils.create_video_clip(video_row, fps)
-    st.video(temp_file.name)
+    temp_file = utils.create_video_clip(video_row, fps)
+    st.video(temp_file)
 
 st.set_page_config(
     page_title="AI Fire Safety Project",
