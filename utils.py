@@ -1,15 +1,19 @@
 import cv2
 import numpy as np
+import tempfile
 from keras.models import load_model
 
-# Load your model here
-model = load_model('path_to_your_model.h5')
+# Update this path to your actual model path
+model = load_model('age-gender-recognition-retail-0013.h5')  # Update if you have a different model
+
+input_width = 64  # Specify the input width of your model
+input_height = 64  # Specify the input height of your model
 
 def preprocess_image(image):
     """Preprocess the image before prediction."""
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image_resized = cv2.resize(image, (input_width, input_height))  # Specify your input dimensions
-    image_normalized = image_resized / 255.0  # Normalize if needed
+    image_resized = cv2.resize(image, (input_width, input_height))  # Resize image
+    image_normalized = image_resized / 255.0  # Normalize the image
     return np.expand_dims(image_normalized, axis=0)  # Add batch dimension
 
 def predict_image(frame):
@@ -17,7 +21,7 @@ def predict_image(frame):
     try:
         processed_frame = preprocess_image(frame)
         predictions = model.predict(processed_frame)
-        
+
         # Assuming your model returns emotions, ages, and genders
         detected_emotion = extract_emotion(predictions)
         detected_age = extract_age(predictions)
@@ -34,6 +38,7 @@ def predict_image(frame):
 
 def visualize_predictions(frame, predictions):
     # Implement visualization logic if needed
+    # Draw bounding boxes or labels on the frame if necessary
     return frame  # Just return the frame for now
 
 def create_video_clip(video_row, fps):
