@@ -1,22 +1,57 @@
-# utils.py
 import cv2
 import numpy as np
+from keras.models import load_model
 
-def predict_image(frame, conf_threshold=0.2):
-    """Process the input frame to detect emotion, age, and gender."""
-    # This is a placeholder for your actual image processing logic
-    # Here you would typically run your model inference
-    # For example, use a pre-trained model to predict attributes
+# Load your model here
+model = load_model('path_to_your_model.h5')
 
-    # Simulated predictions (replace with actual model inference)
-    detected_emotion = "happy"  # Example emotion
-    detected_age = 25            # Example age
-    detected_gender = "female"   # Example gender
+def preprocess_image(image):
+    """Preprocess the image before prediction."""
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image_resized = cv2.resize(image, (input_width, input_height))  # Specify your input dimensions
+    image_normalized = image_resized / 255.0  # Normalize if needed
+    return np.expand_dims(image_normalized, axis=0)  # Add batch dimension
 
-    # You may want to add code to visualize the frame or add annotations
-    visualized_image = frame.copy()
-    cv2.putText(visualized_image, f"Emotion: {detected_emotion}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-    cv2.putText(visualized_image, f"Age: {detected_age}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-    cv2.putText(visualized_image, f"Gender: {detected_gender}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+def predict_image(frame):
+    """Predict emotion, age, and gender from the input frame."""
+    try:
+        processed_frame = preprocess_image(frame)
+        predictions = model.predict(processed_frame)
+        
+        # Assuming your model returns emotions, ages, and genders
+        detected_emotion = extract_emotion(predictions)
+        detected_age = extract_age(predictions)
+        detected_gender = extract_gender(predictions)
 
-    return visualized_image, detected_emotion, detected_age, detected_gender
+        # Visualize results on the frame
+        visualized_image = visualize_predictions(frame, predictions)
+
+        return visualized_image, detected_emotion, detected_age, detected_gender
+
+    except Exception as e:
+        print(f"Error in prediction: {str(e)}")
+        return frame, "Error", "Error", "Error"  # Return frame with error message
+
+def visualize_predictions(frame, predictions):
+    # Implement visualization logic if needed
+    return frame  # Just return the frame for now
+
+def create_video_clip(video_row, fps):
+    """Create a video clip from processed frames."""
+    import moviepy.editor as mpy
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
+    clip = mpy.ImageSequenceClip(video_row, fps=fps)
+    clip.write_videofile(temp_file.name)
+    return temp_file.name
+
+def extract_emotion(predictions):
+    # Replace this with actual logic to extract emotion from predictions
+    return "happy"  # Placeholder
+
+def extract_age(predictions):
+    # Replace this with actual logic to extract age from predictions
+    return 25  # Placeholder
+
+def extract_gender(predictions):
+    # Replace this with actual logic to extract gender from predictions
+    return "female"  # Placeholder
